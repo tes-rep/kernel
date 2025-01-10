@@ -75,9 +75,10 @@ on:
         options:
           - -ophub
           - -happy-new-year
-          - -Miss-Queen99+
-          - -Cofee-banx99+
-          - -xidznet+
+          - -MissQueenx+
+          - -CofeeBanx+
+          - -XidzNetx+
+          - -LiTe-Editionx+
       kernel_config:
         description: "Set the path of kernel .config"
         required: false
