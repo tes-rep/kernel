@@ -78,7 +78,7 @@ on:
           - -MissQueenx+
           - -CofeeBanx+
           - -XidzNetx+
-          - -LiTe-Editionx+
+          - -IDx-Editionx+
       kernel_config:
         description: "Set the path of kernel .config"
         required: false
