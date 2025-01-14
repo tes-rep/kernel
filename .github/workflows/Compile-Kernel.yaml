@@ -4,7 +4,7 @@
 # Copyright (C) 2021 https://github.com/ophub/kernel
 #==========================================================================
 
-name: Compile custom kernel [ sib0ndt ]
+name: Compile custom kernel
 
 on:
   repository_dispatch:
