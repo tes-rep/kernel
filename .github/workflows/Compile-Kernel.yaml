@@ -68,7 +68,8 @@ on:
         type: choice
         options:
           - -ophub
-          - -happy-new-year
+          - -Mystic+
+          - -Synergy+
           - -MissQueenx+
           - -XidzNetx+
           - -LiTeEditionx+
