@@ -30,6 +30,7 @@ on:
           - 5.15.y
           - 6.1.y
           - 6.6.y
+          - 6.1.66
       kernel_auto:
         description: "Auto use the latest kernel"
         required: false
