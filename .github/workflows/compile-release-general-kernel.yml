@@ -13,15 +13,16 @@ on:
       kernel_source:
         description: "Select the kernel source"
         required: false
-        default: "unifreq"
+        default: "Dirgha80"
         type: choice
         options:
           - unifreq
           - codesnas
+          - Dirgha80
       kernel_version:
         description: "Select kernel version"
         required: false
-        default: "6.12.y"
+        default: "6.14.y"
         type: choice
         options:
           - 5.4.y
@@ -30,6 +31,7 @@ on:
           - 6.1.y
           - 6.6.y
           - 6.12.y
+          - 6.14.y
           - 5.4.y_5.10.y
           - 5.15.y_6.1.y
           - 6.6.y_6.12.y
@@ -85,7 +87,7 @@ on:
           - -summer-growing
           - -autumn-harvesting
           - -winter-storing
-          - -yourname
+          - -hj
       kernel_config:
         description: "Set the path of kernel .config"
         required: false
