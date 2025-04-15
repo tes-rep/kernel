@@ -86,7 +86,7 @@ on:
           - false
 
 env:
-  TZ: America/New_York
+  TZ: Asia/Jakarta
 
 jobs:
   build:
