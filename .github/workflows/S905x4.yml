@@ -20,6 +20,7 @@ on:
           - codesnas
           - Dirgha80
           - Houjie80
+          - feryw@dev
       kernel_version:
         description: "Select kernel version"
         required: false
