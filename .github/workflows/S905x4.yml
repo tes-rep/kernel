@@ -21,6 +21,7 @@ on:
           - Dirgha80
           - Houjie80
           - feryw@dev
+          - sib0ndt
       kernel_version:
         description: "Select kernel version"
         required: false
@@ -34,6 +35,7 @@ on:
           - 6.6.y
           - 6.14.y
           - 6.12.y
+          - 6.1.66
           - 5.4.y_5.10.y
           - 5.15.y_6.1.y
           - 6.6.y_6.12.y
