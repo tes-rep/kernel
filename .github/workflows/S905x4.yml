@@ -13,7 +13,7 @@ on:
       kernel_source:
         description: "Select the kernel source"
         required: false
-        default: "unifreq"
+        default: "Houjie80"
         type: choice
         options:
           - unifreq
@@ -23,7 +23,7 @@ on:
       kernel_version:
         description: "Select kernel version"
         required: false
-        default: "6.12.y"
+        default: "6.6.y_6.12.y"
         type: choice
         options:
           - 5.4.y
@@ -80,9 +80,10 @@ on:
       kernel_config:
         description: "Set the path of kernel .config"
         required: false
-        default: "kernel-config/release/general"
+        default: "kernel-config/release/s905x4"
         type: choice
         options:
+          - kernel-config/release/s905x4
           - kernel-config/release/general
           - false
       kernel_mu:
