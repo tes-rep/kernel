@@ -21,7 +21,7 @@ on:
           - Dirgha80
           - Houjie80
           - feryw@dev
-          - sib0ndt
+          - sib0ndt/linux-6.1.66
       kernel_version:
         description: "Select kernel version"
         required: false
