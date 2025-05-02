@@ -1,6 +1,7 @@
 # Deskripsi Kernel
 
 Lihat Deskripsi Cina |  [查看中文说明](readme.cn.md)
+Lihat Deskripsi indonesa |  [查看中文说明](readme.ID.md)
 
 Kernel ini dapat digunakan untuk sistem `armbian` dan` openwrt`, seperti [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions), dan [Unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) proyek. Mereka dapat diintegrasikan saat menyusun firmware atau diinstal dalam sistem yang ada. Di antara mereka, [kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [kernel_dev](https://github.com/ophub/kernel/releases/tag/kernel_dev) dan [kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) adalah interchangeable umum. Untuk metode penggunaan khusus, lihat instruksi [Kernel Gunakan](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel).
 
@@ -16,13 +17,12 @@ Kernel ini dapat digunakan untuk sistem `armbian` dan` openwrt`, seperti [amlogi
 - Bagian [alat](https://github.com/ophub/kernel/releases/tag/tools) dalam rilis telah mengunduh gambar `sistem android` untuk beberapa kotak TV umum, yang dapat digunakan untuk mengembalikan sistem Android saat menggunakan sistem Armbian dan OpenWRT.
 
 
-Kompilasi Kernel ##
+## Kompilasi Kernel ##
 
 -Untuk metode kompilasi kernel, silakan merujuk ke [Compile-Kernel](https://github.com/ophub/amlogic-s9xx-armbian/tree/main/compile-kernel). Untuk metode kompilasi kernel menggunakan tindakan di github.com, lihat [.github/alur kerja](. GitHub/alur kerja). Anda dapat menyesuaikan kernel dengan memodifikasi file konfigurasi kernel di [kernel-config](kernel-config), dan tambahkan tambalan kernel khusus di direktori [kernel-patch](kernel-patch).
 
-- Anda dapat menyesuaikan konfigurasi kernel sesuai dengan kebutuhan Anda, seperti menambahkan driver dan tambalan. Anda juga dapat menyusun kernel tanda tangan yang dipersonalisasi dengan makna khusus sesuai dengan suasana hati Anda, seperti `5.10.95-Happy-new-tahun`,` 5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day`, dll.
+- Anda dapat menyesuaikan konfigurasi kernel sesuai dengan kebutuhan Anda, seperti menambahkan driver dan tambalan. Anda juga dapat menyusun kernel tanda tangan yang dipersonalisasi dengan makna khusus sesuai dengan suasana hati Anda, seperti `5.10.95-Happy-new-year`,` 5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day`, dll.
 
-`` `Yaml
 - Nama: Kompilasi kernel
   Penggunaan: Ophub/amlogic-s9xxx-mrembian@main
   dengan:
@@ -32,23 +32,23 @@ Kompilasi Kernel ##
     Kernel_Sign: -yyourname
 `` `
 
-Kode Sumber Kernel ##
+## Kode Sumber Kernel ##
 
 Terima kasih banyak untuk Unifreq dan lainnya karena telah mempertahankan kode sumber kernel. Kode sumber yang digunakan dalam file kernel di repositori adalah sebagai berikut:
 
 | Tag kernel | Repositori Kode Sumber | Perangkat yang berlaku |
 | ------------- | ----------------------- | ----------------------- |
-| [kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy) <br> [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stab le) <br> [kernel_dev](https://github.com/ophub/kernel/releases/tag/kernel_dev) <br> [kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) | [Unifreq/linux-5.4.y](https://github.com/unifreq/linux-5.4.y) <br> [unifreq/linux-5.10.y](https://gi thub.com/unifreq/linux-5.10.y) <br> [unifreq/linux-5.15.y](https://github.com/unifreq/linux-5.15.y) < Br> [Unifreq/linux-6.1.y](https://github.com/unifreq/linux-6.1.y) <br> [Unifreq/linux-6.6.y](https://github.com/unifreq/linux-6.6.y) <br> [unifreq/linux-6.12.y](https://github.com/unifreq/linux-6.12.y) | Amlogic <br> allwinner <br> rockchip |
-| [kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) | [Unifreq/linux-5.10.y-rk35xx](https://github.com/unifreq/linux-5.10.y-rk35xx) | Rockchip-RK3588 |
-| [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [Unifreq/linux-5.10.y-rk35xx](https://github.com/unifreq/linux-5.10.y-rk35xx) | Rockchip-RK3528/RK3566/RK3568 |
-| [kernel_h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) | [13584452567/linux-6.4.y](https://github.com/13584452567/linux-6.4.y) <br> [13584452567/linux-6.5.y](https://github.com/13584452567/linux-6.5.y) <br> [13584452567/linux-6.6.y](https://github.com/13584452567/linix-6.6.y) | Allwinner-H6(TQC-A01) |
-| [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) <br> [kernel_dev](https://github.com/ophub/kernel/releases/tag/kernel_dev) <br> [Kernel_h6 /kernel/rilis/tag/kernel_h6) <br> [kernel_rk3588](https://github.com/ophub/kernel/releases/ta g/kernel_rk3588) <br> [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [codesnas/linux-5.4.y](https://github.com/codesnas/linux-5.4.y) <br> [codesnas/linux-5.10.y](https://github.com/codesnas/linix-5.10.y) <br> [cod ESNAS/Linux-5.15.Y](https://github.com/codesnas/linux-5.15.y) <br> [codesnas/linux-6.1.y](https://github.com/codesnas/linix-6.1.y) <br> [codesna s/linux-6.6.y](https://github.com/codesnas/linux-6.6.y) <br> [codesnas/linux-6.12.y](https://github.com/codesnas/linix-6.12.y) <br> [codesnas/li nux-h6-6.6.y](https://github.com/codesnas/linux-h6-6.6.y) <br> [codesnas/linux-5.10.y-rk35xx](https://github.com/codesnas/linux-5.10.y-rk35xx) | Kode sumber kernel dikloning dari repositori <br> dari [Unifreq](https://github.com/unifreq), [13584452567](https://github.com/1358452567) dan [chewitt](htttps:gllinix/gubux/gridps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps:gitps: G untuk menambal kernel dengan mengikuti para ahli ini. |
+| [kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy)<br>[kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable)<br>[kernel_dev](https://github.com/ophub/kernel/releases/tag/kernel_dev)<br>[kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) | [unifreq/linux-5.4.y](https://github.com/unifreq/linux-5.4.y)<br>[unifreq/linux-5.10.y](https://github.com/unifreq/linux-5.10.y)<br>[unifreq/linux-5.15.y](https://github.com/unifreq/linux-5.15.y)<br>[unifreq/linux-6.1.y](https://github.com/unifreq/linux-6.1.y)<br>[unifreq/linux-6.6.y](https://github.com/unifreq/linux-6.6.y)<br>[unifreq/linux-6.12.y](https://github.com/unifreq/linux-6.12.y) | Amlogic<br>Allwinner<br>Rockchip |
+| [kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) | [unifreq/linux-5.10.y-rk35xx](https://github.com/unifreq/linux-5.10.y-rk35xx) | Rockchip-RK3588 |
+| [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [unifreq/linux-5.10.y-rk35xx](https://github.com/unifreq/linux-5.10.y-rk35xx) | Rockchip-RK3528/RK3566/RK3568 |
+| [kernel_h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) | [13584452567/linux-6.4.y](https://github.com/13584452567/linux-6.4.y)<br>[13584452567/linux-6.5.y](https://github.com/13584452567/linux-6.5.y)<br>[13584452567/linux-6.6.y](https://github.com/13584452567/linux-6.6.y) | Allwinner-H6(TQC-A01) |
+| [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable)<br>[kernel_dev](https://github.com/ophub/kernel/releases/tag/kernel_dev)<br>[kernel_h6](https://github.com/ophub/kernel/releases/tag/kernel_h6)<br>[kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588)<br>[kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [codesnas/linux-5.4.y](https://github.com/codesnas/linux-5.4.y)<br>[codesnas/linux-5.10.y](https://github.com/codesnas/linux-5.10.y)<br>[codesnas/linux-5.15.y](https://github.com/codesnas/linux-5.15.y)<br>[codesnas/linux-6.1.y](https://github.com/codesnas/linux-6.1.y)<br>[codesnas/linux-6.6.y](https://github.com/codesnas/linux-6.6.y)<br>[codesnas/linux-6.12.y](https://github.com/codesnas/linux-6.12.y)<br>[codesnas/linux-h6-6.6.y](https://github.com/codesnas/linux-h6-6.6.y)<br>[codesnas/linux-5.10.y-rk35xx](https://github.com/codesnas/linux-5.10.y-rk35xx) | Kode sumber kernel dikloning dari repositori <br> [unifreq](https://github.com/unifreq), [13584452567](https://github.com/13584452567) dan [chewitt](https://github.com/chewitt/linux), | Kode sumber kernel dikloning dari repositori <br> dari [Unifreq](https://github.com/unifreq), [13584452567](https://github.com/1358452567) dan [chewitt](htttps:gllinix/gubux/gridps:gitps:gitps) untuk menambal kernel dengan mengikuti para ahli ini. |
 | [kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) | [Armbian/Linux-Rockchip](https://github.com/armbian/linux-rockchip) | Rockchip-beta(6.1.y) |
 | [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [Armbian/Linux-Rockchip](https://github.com/armbian/linux-rockchip) | Rockchip-beta(6.1.y) |
 | [kernel_s905x4](https://github.com/houjie80/kernel2/releases/tag/kernel_s905x4) | [Sibondt/Linux-6.1.66](https://github.com/sib0ndt/linux-6.1.66) <br> [houji80/linux-6.6.y](https://github.com/houji80/linux-6.6.y) <br> [houji80/linux-6.12.y](https://github.com/houuji80/linux-6.12.y) | Amlogic S905x4
 
 
-Tautan ##
+## Tautan ##
 
 - [Unifreq/Kernel](https://github.com/unifreq)
 - [13584452567/kernel](https://github.com/13584452567/linux-6.4.y)
@@ -59,6 +59,6 @@ Tautan ##
 - [houji80/linux-6.12.y](https://github.com/houjie80/linux-6.12.y)
 - [houji80/linux-6.6.y](https://github.com/houjie80/linux-6.6.y)
 
-Lisensi ##
+## Lisensi 
 
 Kernel © Ophub dilisensikan di bawah [GPL-2.0](https://github.com/ophub/kernel/blob/main/license)
