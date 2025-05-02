@@ -49,13 +49,13 @@ Terima kasih banyak untuk Unifreq dan lainnya karena telah mempertahankan kode s
 
 Tautan ##
 
-- [Unifreq/Kernel] (https://github.com/unifreq)
-- [13584452567/kernel] (https://github.com/13584452567/linux-6.4.y)
-- [Chewitt/Linux] (https://github.com/chewitt/linux)
-- [torvalds/linux] (https://github.com/torvalds/linux)
-- [kernel.org] (https://kernel.org)
--[Sibondt/Linux-6.1.66] (https://github.com/sib0ndt/linux-6.1.66)
+- [Unifreq/Kernel](https://github.com/unifreq)
+- [13584452567/kernel](https://github.com/13584452567/linux-6.4.y)
+- [Chewitt/Linux](https://github.com/chewitt/linux)
+- [torvalds/linux](https://github.com/torvalds/linux)
+- [kernel.org](https://kernel.org)
+- [Sibondt/Linux-6.1.66](https://github.com/sib0ndt/linux-6.1.66)
 
 Lisensi ##
 
-Kernel © Ophub dilisensikan di bawah [GPL-2.0] (https://github.com/ophub/kernel/blob/main/license)
+Kernel © Ophub dilisensikan di bawah [GPL-2.0](https://github.com/ophub/kernel/blob/main/license)
