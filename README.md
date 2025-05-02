@@ -12,7 +12,7 @@ These kernels can be used for `Armbian` and `OpenWrt` systems, such as the [amlo
 - The kernel files in the [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) section of the Releases are `special version` for the `rk3528/rk3566/rk3568` series, and they are not compatible with other series.
 - The kernel files in the [kernel_h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) section of the Releases are `special version` for the `Allwinner H6 (TQC-A01)` device, and they are not compatible with other series.
 - The [dev](https://github.com/ophub/kernel/releases/tag/dev) section in the Releases has the download image of the `cross-compilation toolchain` required when compiling the kernel.
-- The [s905x4](https://github.com/Dirgha80/kernel/releases/tag/s905x4) khusus amlogic s905x4
+- The [s905x4](https://github.com/Houjie80/kernel2/releases/tag/kernel_s905x4) khusus amlogic s905x4
 - The [tools](https://github.com/ophub/kernel/releases/tag/tools) section in the Releases has download images of `Android systems` for some common TV boxes, which can be used to restore the Android system when using Armbian and OpenWrt systems.
 
 
@@ -54,6 +54,7 @@ A big thank you to unifreq and others for maintaining the kernel source code. Th
 - [chewitt/linux](https://github.com/chewitt/linux)
 - [torvalds/linux](https://github.com/torvalds/linux)
 - [kernel.org](https://kernel.org)
+- [sibondt/linux-6.1.66](https://github.com/sib0ndt/linux-6.1.66)
 
 ## License
 
