@@ -55,6 +55,9 @@ A big thank you to unifreq and others for maintaining the kernel source code. Th
 - [chewitt/linux](https://github.com/chewitt/linux)
 - [torvalds/linux](https://github.com/torvalds/linux)
 - [kernel.org](https://kernel.org)
+- [sibondt/linux-6.1.66](https://github.com/sib0ndt/linux-6.1.66)
+- [Houjie80/linux-6.12.y](https://github.com/Houjie80/linux-6.12.y)
+- [Houjie80/linux-6.6.y](https://github.com/Houjie80/linux-6.6.y)
 
 ## License
 
