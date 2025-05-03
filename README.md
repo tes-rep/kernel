@@ -2,6 +2,8 @@
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
+View indonesia description  |  [indonesia](README.ID.md)
+
 These kernels can be used for `Armbian` and `OpenWrt` systems, such as the [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions), and [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) projects. They can be integrated when compiling firmware or installed in an existing system. Among them, [kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [kernel_dev](https://github.com/ophub/kernel/releases/tag/kernel_dev) and [kernel_beta](https://github.com/ophub/kernel/releases/tag/kernel_beta) are interchangeable general-purpose kernels. For specific usage methods, see the [Kernel Use Instructions](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel).
 
 - The kernel files in the [kernel_flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy) section of the Releases are `stable version`, which are series kernels shared by `flippy`.
@@ -12,7 +14,7 @@ These kernels can be used for `Armbian` and `OpenWrt` systems, such as the [amlo
 - The kernel files in the [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) section of the Releases are `special version` for the `rk3528/rk3566/rk3568` series, and they are not compatible with other series.
 - The kernel files in the [kernel_h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) section of the Releases are `special version` for the `Allwinner H6 (TQC-A01)` device, and they are not compatible with other series.
 - The [dev](https://github.com/ophub/kernel/releases/tag/dev) section in the Releases has the download image of the `cross-compilation toolchain` required when compiling the kernel.
-- The [s905x4](https://github.com/Houjie80/kernel2/releases/tag/kernel_s905x4) khusus amlogic s905x4(experimental)
+- The [s905x4](https://github.com/Houjie80/kernel2/releases/tag/kernel_s905x4) for amlogic s905x4(experimental)
 - The [tools](https://github.com/ophub/kernel/releases/tag/tools) section in the Releases has download images of `Android systems` for some common TV boxes, which can be used to restore the Android system when using Armbian and OpenWrt systems.
 
 
@@ -45,6 +47,7 @@ A big thank you to unifreq and others for maintaining the kernel source code. Th
 | [kernel_stable](https://github.com/ophub/kernel/releases/tag/kernel_stable)<br>[kernel_dev](https://github.com/ophub/kernel/releases/tag/kernel_dev)<br>[kernel_h6](https://github.com/ophub/kernel/releases/tag/kernel_h6)<br>[kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588)<br>[kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [codesnas/linux-5.4.y](https://github.com/codesnas/linux-5.4.y)<br>[codesnas/linux-5.10.y](https://github.com/codesnas/linux-5.10.y)<br>[codesnas/linux-5.15.y](https://github.com/codesnas/linux-5.15.y)<br>[codesnas/linux-6.1.y](https://github.com/codesnas/linux-6.1.y)<br>[codesnas/linux-6.6.y](https://github.com/codesnas/linux-6.6.y)<br>[codesnas/linux-6.12.y](https://github.com/codesnas/linux-6.12.y)<br>[codesnas/linux-h6-6.6.y](https://github.com/codesnas/linux-h6-6.6.y)<br>[codesnas/linux-5.10.y-rk35xx](https://github.com/codesnas/linux-5.10.y-rk35xx) | The kernel source code was cloned from the repositories <br>of [unifreq](https://github.com/unifreq), [13584452567](https://github.com/13584452567) and [chewitt](https://github.com/chewitt/linux), facilitating learning <br>how to patch the kernel by following these experts. |
 | [kernel_rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) | [armbian/linux-rockchip](https://github.com/armbian/linux-rockchip) | Rockchip-Beta(6.1.y) |
 | [kernel_rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) | [armbian/linux-rockchip](https://github.com/armbian/linux-rockchip) | Rockchip-Beta(6.1.y) |
+| [kernel_s905x4](https://github.com/Houjie80/kernel2/releases/tag/kernel_s905x4) | [sibondt/linux-6.1.66](https://github.com/sib0ndt/linux-6.1.66)<br>[Houjie80/linux-6.6.y](https://github.com/Houjie80/linux-6.6.y)<br>[Houjie80/linux-6.12.y](https://github.com/Houjie80/linux-6.12.y) | Amlogic s905x4
 
 
 ## Links
@@ -55,6 +58,8 @@ A big thank you to unifreq and others for maintaining the kernel source code. Th
 - [torvalds/linux](https://github.com/torvalds/linux)
 - [kernel.org](https://kernel.org)
 - [sibondt/linux-6.1.66](https://github.com/sib0ndt/linux-6.1.66)
+- [Houjie80/linux-6.12.y](https://github.com/Houjie80/linux-6.12.y)
+- [Houjie80/linux-6.6.y](https://github.com/Houjie80/linux-6.6.y)
 
 ## License
 
