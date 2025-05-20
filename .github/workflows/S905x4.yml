@@ -20,6 +20,7 @@ on:
           - codesnas
           - Dirgha80
           - Houjie80
+          - tes-rep
       kernel_version:
         description: "Select kernel version"
         required: false
@@ -64,6 +65,7 @@ on:
           - gcc-12.3
           - gcc-13.2
           - gcc-13.3
+          - gcc-14.2
       compress_format:
         description: "Set the initrd compression format"
         required: false
