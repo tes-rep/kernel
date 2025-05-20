@@ -20,6 +20,7 @@ on:
           - codesnas
           - Dirgha80
           - Houjie80
+          - tes-rep
       kernel_version:
         description: "Select kernel version"
         required: false
