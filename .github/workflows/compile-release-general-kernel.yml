@@ -18,8 +18,6 @@ on:
         options:
           - unifreq
           - codesnas
-          - Dirgha80
-          - Houjie80
       kernel_version:
         description: "Select kernel version"
         required: false
@@ -31,13 +29,25 @@ on:
           - 5.15.y
           - 6.1.y
           - 6.6.y
-          - 6.14.y
           - 6.12.y
           - 5.4.y_5.10.y
           - 5.15.y_6.1.y
           - 6.6.y_6.12.y
+          - 5.4.y_5.10.y_5.15.y
+          - 6.1.y_6.6.y_6.12.y
+          - all
       kernel_auto:
         description: "Auto use the latest kernel"
+        required: false
+        default: true
+        type: boolean
+      silent_log:
+        description: "Use silent logging"
+        required: false
+        default: true
+        type: boolean
+      delete_source:
+        description: "Delete the source after compilation"
         required: false
         default: true
         type: boolean
@@ -57,11 +67,7 @@ on:
         options:
           - clang
           - gcc
-          - gcc-11.3
-          - gcc-12.2
-          - gcc-12.3
-          - gcc-13.2
-          - gcc-13.3
+          - gcc-14.2
       compress_format:
         description: "Set the initrd compression format"
         required: false
@@ -75,8 +81,20 @@ on:
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
-        default: "-Hj"
-        type: string
+        default: "-ophub"
+        type: choice
+        options:
+          - -ophub
+          - -happy-new-year
+          - -dragon-boat-festival
+          - -mid-autumn-festival
+          - -happy-national-day
+          - -merry-christmas
+          - -spring-plowing
+          - -summer-growing
+          - -autumn-harvesting
+          - -winter-storing
+          - -yourname
       kernel_config:
         description: "Set the path of kernel .config"
         required: false
@@ -87,11 +105,11 @@ on:
           - false
 
 env:
-  TZ: Asia/Jakarta
+  TZ: America/New_York
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04-arm
     if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
@@ -157,11 +175,13 @@ jobs:
           kernel_source: ${{ inputs.kernel_source }}
           kernel_version: ${{ inputs.kernel_version }}
           kernel_auto: ${{ inputs.kernel_auto }}
+          delete_source: ${{ inputs.delete_source }}
           kernel_package: ${{ inputs.kernel_package }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_config: ${{ inputs.kernel_config }}
           compress_format: ${{ inputs.compress_format }}
+          silent_log: ${{ inputs.silent_log }}
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
@@ -175,7 +195,5 @@ jobs:
             - The kernel can be used to compile Armbian and OpenWrt.
             - The kernel source code comes from: ${{ inputs.kernel_source }}
             - The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}
-            - The kernel version: ${{ inputs.kernel_version }}
-            - The kernel nama: ${{ inputs.kernel_sign }}
             - This is a `stable` kernel, which can be used in Armbian and OpenWrt.
             - 这是`稳定版`内核，可以在 Armbian 和 OpenWrt 里使用。
