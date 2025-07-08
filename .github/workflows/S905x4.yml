@@ -102,6 +102,7 @@ on:
           - stable
           - dev
           - beta    
+          - dtb
 
 env:
   TZ: Asia/Jakarta
