@@ -63,7 +63,7 @@ jobs:
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: kernel-${{ steps.version.outputs.version }}
+          tag: kernel_${{ inputs.kernel_mu }}
           name: Kernel ${{ steps.version.outputs.version }}
           body: |
             Auto-uploaded kernel version ${{ steps.version.outputs.version }}
