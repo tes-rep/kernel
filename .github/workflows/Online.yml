@@ -59,7 +59,7 @@ jobs:
            else
             link_gdrive=$(echo ${{ github.event.inputs.kernel_url }} | awk -F "/" '{print $4}' | awk -F "?id=" '{print $2}'|awk -F "&export" '{print $1}')
            fi
-           sudo gdown ${link_gdrive} -O build/file.${{ github.event.inputs.type_file2 }}
+           sudo gdown ${link_gdrive} -O /workdir/build/file.${{ github.event.inputs.type_file2 }}
            else
            if [ $(echo ${{ github.event.inputs.kernel_url }} | grep "mediafire.com") ]; then
             sudo mediafire-dl ${{ github.event.inputs.kernel_url }} -o build/file.${{ github.event.inputs.type_file2 }}
