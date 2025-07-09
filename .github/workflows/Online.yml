@@ -18,14 +18,10 @@ on:
           - dev
           - beta    
           - dtb  
-      type_file2:
-        description: "Select type file"
-        required: false
-        default: "tar.gz"
-        type: choice
-        options:
-          - tar.gz
-          - zip     
+      rename_rootfs:
+        description: "Rename rootfs"
+        required: true
+        default: ""
 
 jobs:
   upload_kernel_release:
@@ -59,16 +55,16 @@ jobs:
            else
             link_gdrive=$(echo ${{ github.event.inputs.kernel_url }} | awk -F "/" '{print $4}' | awk -F "?id=" '{print $2}'|awk -F "&export" '{print $1}')
            fi
-           sudo gdown ${link_gdrive} -O /workdir/build/file.${{ github.event.inputs.type_file2 }}
+           sudo gdown ${link_gdrive} -O /workdir/build/${{ inputs.rename_rootfs }}.tar.gz
            else
            if [ $(echo ${{ github.event.inputs.kernel_url }} | grep "mediafire.com") ]; then
-            sudo mediafire-dl ${{ github.event.inputs.kernel_url }} -o build/file.${{ github.event.inputs.type_file2 }}
+            sudo mediafire-dl ${{ github.event.inputs.kernel_url }} -o /workdir/build/${{ inputs.rename_rootfs }}.tar.gz
             else
             if [ $(echo ${{ github.event.inputs.kernel_url }} | grep "mega.nz") ]; then
               file_mega=$(sudo mega-get ${{ github.event.inputs.kernel_url }} | awk -F: '{print $2}')
               sudo mv ${file_mega} build/file.zip
             else
-              sudo wget --no-check-certificate ${{ github.event.inputs.kernel_url }} -O build/file.${{ github.event.inputs.type_file2 }}
+              sudo wget --no-check-certificate ${{ github.event.inputs.kernel_url }} -O /workdir/build/${{ inputs.rename_rootfs }}.tar.gz
             fi
            fi
            fi    
