@@ -72,6 +72,7 @@ jobs:
             fi
            fi
            fi    
+           ln -sf /workdir/build $GITHUB_WORKSPACE/build
         
 
       - name: Upload release asset
