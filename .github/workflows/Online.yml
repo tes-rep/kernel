@@ -18,36 +18,59 @@ on:
           - dev
           - beta    
           - dtb  
+      type_file2:
+        description: "Select type file"
+        required: false
+        default: "tar.gz"
+        type: choice
+        options:
+          - tar.gz
+          - zip     
 
 jobs:
   upload_kernel_release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       
-      - name: Install tools
+      - name: Initialization environment (normal)
+        # if: github.event.inputs.target != 'all' && !cancelled()
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo apt update
-          sudo apt install -y aria2 megatools curl
+          sudo apt-get -qq update
+          sudo apt-get -qq install build-essential libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync wget unzip tar gzip qemu-utils mkisofs
+          sudo apt-get -qq install jq python3 python3-pip
+          pip install telethon
+          pip install colorama
+          sudo pip3 install gdown
+          sudo pip3 install git+https://github.com/Juvenal-Yescas/mediafire-dl
+          #wget https://mega.nz/linux/repo/xUbuntu_24.04/amd64/megacmd-xUbuntu_24.04_amd64.deb && sudo apt install "$PWD/megacmd-xUbuntu_24.04_amd64.deb"
+          #sudo timedatectl set-timezone "$TZ"
 
-      - name: Download kernel (Mediafire/Mega safe)
+
+      - name: Download kernel
         run: |
-          url="${{ github.event.inputs.kernel_url }}"
-
-          if [[ "$url" =~ mega\.nz ]]; then
-            megadl --path=./downloaded "$url"
-            FILE=$(ls downloaded | head -n 1)
-            mv "downloaded/$FILE" "$FILE"
-          else
-            FILENAME=$(curl -sI -L "$url" | grep -i 'content-disposition' | sed -E 's/.*filename="?([^"]+)"?.*/\1/' | tail -n1)
-            if [ -z "$FILENAME" ]; then
-              FILENAME=$(basename "$url" | cut -d'?' -f1)
+           if [ $(echo ${{ github.event.inputs.kernel_url }} | grep "drive.") ]; then
+           if [ $(echo ${{ github.event.inputs.kernel_url }} | awk -F "/" '{print $6}') ]; then
+            link_gdrive=$(echo ${{ github.event.inputs.kernel_url }} | awk -F "/" '{print $6}')
+           else
+            link_gdrive=$(echo ${{ github.event.inputs.kernel_url }} | awk -F "/" '{print $4}' | awk -F "?id=" '{print $2}'|awk -F "&export" '{print $1}')
+           fi
+           sudo gdown ${link_gdrive} -O build/file.${{ github.event.inputs.type_file2 }}
+           else
+           if [ $(echo ${{ github.event.inputs.kernel_url }} | grep "mediafire.com") ]; then
+            sudo mediafire-dl ${{ github.event.inputs.kernel_url }} -o build/file.${{ github.event.inputs.type_file2 }}
+            else
+            if [ $(echo ${{ github.event.inputs.kernel_url }} | grep "mega.nz") ]; then
+              file_mega=$(sudo mega-get ${{ github.event.inputs.kernel_url }} | awk -F: '{print $2}')
+              sudo mv ${file_mega} build/file.zip
+            else
+              sudo wget --no-check-certificate ${{ github.event.inputs.kernel_url }} -O build/file.${{ github.event.inputs.type_file2 }}
             fi
-            echo "Detected filename: $FILENAME"
-            curl -L "$url" -o "$FILENAME"
-          fi
-
-          echo "filename=$FILENAME" >> $GITHUB_ENV
+           fi
+           fi    
+        
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
@@ -58,6 +81,6 @@ jobs:
             ✅ Auto-uploaded kernel file
             📦 Source: ${{ github.event.inputs.kernel_url }}
             🧩 Type: `${{ inputs.kernel_mu }}`
-          files: ${{ env.filename }}
+          file: build/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
