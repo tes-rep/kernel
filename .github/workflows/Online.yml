@@ -1,0 +1,73 @@
+name: Upload Kernel to Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      kernel_url:
+        description: 'URL kernel (GitHub raw / Mediafire / Mega)'
+        required: true
+        type: string
+
+jobs:
+  upload_kernel_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract version from kernel URL
+        id: version
+        run: |
+          filename=$(basename "${{ github.event.inputs.kernel_url }}")
+          if [[ "$filename" =~ ([0-9]+\.[0-9]+(\.[0-9]+)?) ]]; then
+            echo "version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          else
+            echo "version=unknown" >> $GITHUB_OUTPUT
+
+      - name: Install tools
+        run: |
+          sudo apt update
+          sudo apt install -y aria2 unzip megatools
+
+      - name: Download kernel archive
+        run: |
+          url="${{ github.event.inputs.kernel_url }}"
+          echo "Downloading: $url"
+
+          if [[ "$url" =~ mega\.nz ]]; then
+            megadl --path=./downloaded "$url"
+            file=$(ls downloaded | head -n 1)
+            mv "downloaded/$file" kernel-archive
+          else
+            aria2c -q -x 16 -s 16 -k 1M -o kernel-archive "$url"
+          fi
+
+      - name: Extract and repackage
+        run: |
+          file kernel-archive
+          mkdir kernel-extracted
+
+          ARCHIVE_TYPE=$(file kernel-archive)
+          if [[ $ARCHIVE_TYPE =~ gzip ]]; then
+            tar -xzf kernel-archive -C kernel-extracted
+          elif [[ $ARCHIVE_TYPE =~ Zip ]]; then
+            unzip kernel-archive -d kernel-extracted
+          elif [[ $ARCHIVE_TYPE =~ POSIX.*tar ]]; then
+            tar -xf kernel-archive -C kernel-extracted
+          else
+            echo "Unknown archive format!"
+            exit 1
+          fi
+
+          cd kernel-extracted
+          tar -czf ../kernel-${{ steps.version.outputs.version }}.tar.gz *
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: kernel-${{ steps.version.outputs.version }}
+          name: Kernel ${{ steps.version.outputs.version }}
+          body: |
+            Auto-uploaded kernel version ${{ steps.version.outputs.version }}
+            Source: ${{ github.event.inputs.kernel_url }}
+          files: kernel-${{ steps.version.outputs.version }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
