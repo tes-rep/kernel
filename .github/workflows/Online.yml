@@ -74,18 +74,13 @@ jobs:
            fi    
         
 
-      - name: Upload Kernel to Release
-        uses: ncipollo/release-action@main
+      - name: Upload release asset
+        uses: svenstaro/upload-release-action@v2
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/*
           tag: kernel_${{ inputs.kernel_mu }}
-          artifacts: build/*
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          overwrite: true
           body: |
-            - The kernel can be used to compile Armbian and OpenWrt.
-            - The kernel source code comes from: ${{ inputs.kernel_source }}
-            - The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}
-            - The kernel version: ${{ inputs.kernel_version }}
-            - The kernel nama: ${{ inputs.kernel_sign }}
-            - This is a `${{ inputs.kernel_mu }}` kernel, which can be used in Armbian and OpenWrt.
-            - 这是`稳定版`内核，可以在 Armbian 和 OpenWrt 里使用。
+          ##  KUMPULAN HASIL MALINK ROOTFS
