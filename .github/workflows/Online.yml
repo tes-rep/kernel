@@ -7,6 +7,17 @@ on:
         description: 'URL kernel (GitHub raw / Mediafire / Mega)'
         required: true
         type: string
+      kernel_mu:
+        description: "Select the kernel source"
+        required: false
+        default: "s905x4"
+        type: choice
+        options:
+          - s905x4
+          - stable
+          - dev
+          - beta    
+          - dtb   
 
 jobs:
   upload_kernel_release:
