@@ -49,8 +49,9 @@ jobs:
             FILE=$(ls downloaded | head -n 1)
             mv "downloaded/$FILE" "$FILE"
           else
-            FILE=$(basename "$url")
-            curl -L -o "$FILE" "$url"
+            FILE=$(basename "$url" | cut -d'?' -f1)
+            echo "Detected filename: $FILE"
+            curl -L "$url" -o "$FILE"
           fi
 
           echo "filename=$FILE" >> $GITHUB_ENV
