@@ -37,49 +37,26 @@ jobs:
       - name: Install tools
         run: |
           sudo apt update
-          sudo apt install -y aria2 unzip megatools curl
+          sudo apt install -y aria2 megatools curl
 
-      - name: Download kernel archive (Mediafire-safe)
+      - name: Download kernel (Mediafire/Mega safe)
         run: |
           url="${{ github.event.inputs.kernel_url }}"
-          echo "Downloading: $url"
 
           if [[ "$url" =~ mega\.nz ]]; then
             megadl --path=./downloaded "$url"
             FILE=$(ls downloaded | head -n 1)
             mv "downloaded/$FILE" "$FILE"
           else
-            # Ambil nama file dari header Content-Disposition (jika ada)
-            FILENAME=$(curl -sI -L "$url" | grep -i 'content-disposition' | sed -E 's/.*filename="?([^"]+)"?.*/\1/' | tail -n 1)
-
-            # Jika tidak ditemukan, fallback ke nama URL
+            FILENAME=$(curl -sI -L "$url" | grep -i 'content-disposition' | sed -E 's/.*filename="?([^"]+)"?.*/\1/' | tail -n1)
             if [ -z "$FILENAME" ]; then
               FILENAME=$(basename "$url" | cut -d'?' -f1)
             fi
-
             echo "Detected filename: $FILENAME"
             curl -L "$url" -o "$FILENAME"
           fi
 
           echo "filename=$FILENAME" >> $GITHUB_ENV
-
-      - name: Extract and repackage
-        run: |
-          mkdir -p kernel-extracted
-
-          if [[ "$filename" =~ \.zip$ ]]; then
-            unzip "$filename" -d kernel-extracted
-          elif [[ "$filename" =~ \.tar\.gz$|\.tgz$ ]]; then
-            tar -xzf "$filename" -C kernel-extracted
-          elif [[ "$filename" =~ \.tar$ ]]; then
-            tar -xf "$filename" -C kernel-extracted
-          else
-            echo "❌ Unsupported archive format: $filename"
-            exit 1
-          fi
-
-          cd kernel-extracted
-          tar -czf ../kernel-${{ steps.version.outputs.version }}.tar.gz *
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v1
@@ -87,9 +64,9 @@ jobs:
           tag_name: kernel_${{ inputs.kernel_mu }}
           name: Kernel ${{ steps.version.outputs.version }}
           body: |
-            ✅ Auto-uploaded kernel: **${{ steps.version.outputs.version }}**
+            ✅ Auto-uploaded kernel file
             📦 Source: ${{ github.event.inputs.kernel_url }}
             🧩 Type: `${{ inputs.kernel_mu }}`
-          files: kernel-${{ steps.version.outputs.version }}.tar.gz
+          files: ${{ env.filename }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
