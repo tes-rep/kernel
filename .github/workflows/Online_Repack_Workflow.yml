@@ -85,14 +85,12 @@ jobs:
             sudo tar -czf /workdir/final/${filename}.tar.gz .
             cd - > /dev/null
 
-            cd /workdir/final
-            sha256sum ${filename}.tar.gz | tee ${filename}.sha256.txt
-            cd - > /dev/null
+        
           done
 
           echo "📦 Mengarsip semua hasil ke final-${{ inputs.rename_rootfs }}.tar.gz"
           cd /workdir/final
-          sudo tar -czf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz *.tar.gz *.sha256.txt
+          sudo tar -czf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz
           echo "✅ Final archive berhasil dibuat: final-${{ inputs.rename_rootfs }}.tar.gz"
 
       - name: Upload release asset
