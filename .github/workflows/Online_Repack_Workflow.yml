@@ -67,7 +67,7 @@ jobs:
         run: |
           mkdir -p /workdir/extracted
           mkdir -p /workdir/final
-          sudo tar -xzf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz -C /workdir/extracted
+          sudo tar -xzf /workdir/build/file.tar.gz -C /workdir/extracted
           echo "✅ File utama diekstrak"
 
           cd /workdir/extracted
