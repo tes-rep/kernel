@@ -43,7 +43,7 @@ jobs:
           sudo pip3 install git+https://github.com/Juvenal-Yescas/mediafire-dl
           #wget https://mega.nz/linux/repo/xUbuntu_24.04/amd64/megacmd-xUbuntu_24.04_amd64.deb && sudo apt install "$PWD/megacmd-xUbuntu_24.04_amd64.deb"
           #sudo timedatectl set-timezone "$TZ"
-          mkdir -p /workdir/build
+          sudo mkdir -p /workdir/build
           #sudo chown $USER:$GROUPS /workdir
 
 
