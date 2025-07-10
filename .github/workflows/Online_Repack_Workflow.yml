@@ -1,0 +1,88 @@
+
+name: Upload Kernel to Release5
+
+on:
+  workflow_dispatch:
+    inputs:
+      kernel_url:
+        description: 'URL kernel (GitHub / Mediafire / Mega)'
+        required: true
+        type: string
+      kernel_mu:
+        description: "Select the kernel source"
+        required: false
+        default: "s905x4"
+        type: choice
+        options:
+          - s905x4
+          - stable
+          - dev
+          - beta    
+          - dtb  
+      rename_rootfs:
+        description: "Rename rootfs"
+        required: true
+        default: ""
+
+jobs:
+  upload_kernel_release:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Initialization environment (normal)
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install build-essential libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync wget unzip tar gzip qemu-utils mkisofs
+          sudo apt-get -qq install jq python3 python3-pip
+          pip install telethon
+          pip install colorama
+          sudo pip3 install gdown
+          sudo pip3 install git+https://github.com/Juvenal-Yescas/mediafire-dl
+          sudo mkdir -p /workdir/build
+          sudo chown $USER:$GROUPS /workdir
+
+      - name: Download kernel
+        run: |
+          if echo "${{ github.event.inputs.kernel_url }}" | grep -q "drive."; then
+            if echo "${{ github.event.inputs.kernel_url }}" | awk -F "/" '{print $6}' >/dev/null; then
+              link_gdrive=$(echo "${{ github.event.inputs.kernel_url }}" | awk -F "/" '{print $6}')
+            else
+              link_gdrive=$(echo "${{ github.event.inputs.kernel_url }}" | awk -F "/" '{print $4}' | awk -F "?id=" '{print $2}' | awk -F "&export" '{print $1}')
+            fi
+            sudo gdown ${link_gdrive} -O /workdir/build/${{ inputs.rename_rootfs }}.tar.gz
+          elif echo "${{ github.event.inputs.kernel_url }}" | grep -q "mediafire.com"; then
+            sudo mediafire-dl "${{ github.event.inputs.kernel_url }}" -o /workdir/build/file.tar.gz
+          elif echo "${{ github.event.inputs.kernel_url }}" | grep -q "mega.nz"; then
+            file_mega=$(sudo mega-get "${{ github.event.inputs.kernel_url }}" | awk -F: '{print $2}')
+            sudo mv "${file_mega}" /workdir/build/file.zip
+          else
+            sudo wget --no-check-certificate "${{ github.event.inputs.kernel_url }}" -O /workdir/build/file.tar.gz
+          fi
+          ln -sf /workdir/build $GITHUB_WORKSPACE/build
+
+      - name: Extract and Repack
+        run: |
+          mkdir -p /workdir/extracted
+          tar -xzf /workdir/build/*.tar.gz -C /workdir/extracted
+          echo "✅ File berhasil di-extract ke /workdir/extracted"
+
+          ## [Opsional] Tambahkan modifikasi isi file di sini
+          ## Contoh: echo "custom value" > /workdir/extracted/etc/custom.txt
+
+          cd /workdir/extracted
+          tar -czf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz *
+
+          echo "✅ File berhasil diarsip ulang: new-${{ inputs.rename_rootfs }}.tar.gz"
+
+      - name: Upload release asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/*.tar.gz
+          tag: kernel_${{ inputs.kernel_mu }}
+          file_glob: true
+          overwrite: true
+          body: |
+            ## KUMPULAN HASIL MALINK ROOTFS
