@@ -19,6 +19,7 @@ on:
           - dev
           - beta    
           - dtb  
+          - tes
       rename_rootfs:
         description: "Rename rootfs"
         required: true
@@ -62,19 +63,37 @@ jobs:
           fi
           ln -sf /workdir/build $GITHUB_WORKSPACE/build
 
-      - name: Extract and Repack
+      - name: Extract, Repack Nested Archives, Generate SHA256, and Final Bundle
         run: |
           mkdir -p /workdir/extracted
-          tar -xzf /workdir/build/*.tar.gz -C /workdir/extracted
-          echo "✅ File berhasil di-extract ke /workdir/extracted"
-
-          ## [Opsional] Tambahkan modifikasi isi file di sini
-          ## Contoh: echo "custom value" > /workdir/extracted/etc/custom.txt
+          mkdir -p /workdir/final
+          sudo tar -xzf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz -C /workdir/extracted
+          echo "✅ File utama diekstrak"
 
           cd /workdir/extracted
-          sudo tar -czf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz *
 
-          echo "✅ File berhasil diarsip ulang: new-${{ inputs.rename_rootfs }}.tar.gz"
+          for archive in $(find . -type f -name "*.tar.gz"); do
+            dirname=$(dirname "$archive")
+            filename=$(basename "$archive" .tar.gz)
+            folder="$dirname/$filename"
+            mkdir -p "$folder"
+            echo "📦 Mengekstrak: $archive -> $folder"
+            sudo tar -xzf "$archive" -C "$folder"
+
+            echo "📦 Mengarsip ulang: $filename.tar.gz"
+            cd "$folder"
+            sudo tar -czf /workdir/final/${filename}.tar.gz .
+            cd - > /dev/null
+
+            cd /workdir/final
+            sha256sum ${filename}.tar.gz | tee ${filename}.sha256.txt
+            cd - > /dev/null
+          done
+
+          echo "📦 Mengarsip semua hasil ke final-${{ inputs.rename_rootfs }}.tar.gz"
+          cd /workdir/final
+          sudo tar -czf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz *.tar.gz *.sha256.txt
+          echo "✅ Final archive berhasil dibuat: final-${{ inputs.rename_rootfs }}.tar.gz"
 
       - name: Upload release asset
         uses: svenstaro/upload-release-action@v2
