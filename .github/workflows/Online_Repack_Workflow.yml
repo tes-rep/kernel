@@ -72,7 +72,7 @@ jobs:
           ## Contoh: echo "custom value" > /workdir/extracted/etc/custom.txt
 
           cd /workdir/extracted
-          tar -czf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz *
+          sudo tar -czf /workdir/build/${{ inputs.rename_rootfs }}.tar.gz *
 
           echo "✅ File berhasil diarsip ulang: new-${{ inputs.rename_rootfs }}.tar.gz"
 
