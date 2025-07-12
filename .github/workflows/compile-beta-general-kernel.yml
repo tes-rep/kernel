@@ -17,8 +17,12 @@ on:
         type: choice
         options:
           - unifreq
+          - codesnas
           - Dirgha80
           - Houjie80
+          - tes-rep
+          - tes-rep@tes
+          - sib0ndt/linux-6.1.66
       kernel_version:
         description: "Select kernel version"
         required: false
@@ -54,7 +58,9 @@ on:
         default: "kernel-config/release/general"
         type: choice
         options:
+          - kernel-config/release/s905x4
           - kernel-config/release/general
+          - kernel-config/release/DBAI
           - false
       kernel_patch:
         description: "Set the directory for kernel patches"
