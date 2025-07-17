@@ -184,11 +184,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             - The kernel can be used to compile Armbian and OpenWrt.
-            - Kernel source: ${{ inputs.kernel_source }}
-            - Version: ${{ inputs.kernel_version }}
-            - Toolchain: ${{ inputs.kernel_toolchain }}
-            - Signature: ${{ inputs.kernel_sign }}
-            - Type: ${{ inputs.kernel_mu }}
+            - The kernel source code comes from: ${{ inputs.kernel_source }}
+            - The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}
+            - The kernel version: ${{ inputs.kernel_version }}
+            - The kernel nama: ${{ inputs.kernel_sign }}
+            - This is a `${{ inputs.kernel_mu }}` kernel, which can be used in Armbian and OpenWrt.
+            - 这是`稳定版`内核，可以在 Armbian 和 OpenWrt 里使用。
 
       - name: Upload Kernel to Release (repo lain)
         uses: softprops/action-gh-release@v1
