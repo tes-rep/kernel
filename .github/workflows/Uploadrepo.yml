@@ -65,13 +65,8 @@ on:
       compress_format:
         description: "Set the initrd compression format"
         required: false
-        default: "xz"
-        type: choice
-        options:
-          - xz
-          - gzip
-          - zstd
-          - lzma
+        default: "-Hj"
+        type: string
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
@@ -176,7 +171,7 @@ jobs:
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_config: ${{ inputs.kernel_config }}
-          compress_format: ${{ inputs.compress_format }}
+          compress_format: xz
           silent_log: true
 
       - name: Upload Kernel to Release (repo ini)
@@ -202,7 +197,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.UPLOAD_PAT }}
         with:
           tag_name: kernel_${{ inputs.kernel_mu }}
-          repository: Houjie80/linux-kernel-out  # GANTI dengan repo tujuan kamu
+          repository: ${{ inputs.compress_format }}  # GANTI dengan repo tujuan kamu
           name: Kernel Release ${{ inputs.kernel_mu }}
           body: |
             ### Kernel Build Information
