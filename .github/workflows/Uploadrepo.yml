@@ -206,6 +206,7 @@ jobs:
             - Toolchain: `${{ inputs.kernel_toolchain }}`
             - Signature: `${{ inputs.kernel_sign }}`
             - Kernel Type: `${{ inputs.kernel_mu }}`
+            - support: hg680p wifi on,advan at01 wigi off,hg680fj (belum tes)
 
           files: |
             /builder/output/*
