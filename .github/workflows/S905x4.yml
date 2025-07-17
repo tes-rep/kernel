@@ -104,7 +104,7 @@ on:
           - dev
           - beta    
           - dtb
-          - wifi on
+          - wifi_on
 
 env:
   TZ: Asia/Jakarta
