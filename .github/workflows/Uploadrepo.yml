@@ -201,7 +201,6 @@ jobs:
           name: Kernel Release ${{ inputs.kernel_mu }}
           body: |
             ### Kernel Build Information
-            - Kernel Source: `${{ inputs.kernel_source }}`
             - Version: `${{ inputs.kernel_version }}`
             - Toolchain: `${{ inputs.kernel_toolchain }}`
             - Signature: `${{ inputs.kernel_sign }}`
