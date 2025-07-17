@@ -193,10 +193,8 @@ jobs:
             ## Supported Devices
             | Amlogic | MODEL | WIFI |
             | -------- | ------- | ------- |
-            | **S905x**  | **HG680P** | **ON** (`-`) |
-            | **S905x** | **B860H** | **NOT TEST**|
-            | **S905X4** | **ADVAN AT01** | **OFF** (`-`) |
-            | **S905X4** | **AKARI** | **OFF** (`-`) |
+            | **S905x**  | **HG680P**<br>**B860H** | **ON**<br>**NOT TEST** |
+            | **S905X4** | **ADVAN AT01**<br>**AJARI** | **OFF**<br>**OFF** |
             | **S905x2** | **HG680FJ** | **NOT TEST** (`-`) |
 
       - name: Upload Kernel to Release (repo lain)
@@ -217,11 +215,9 @@ jobs:
             ## Supported Devices
             | Amlogic | MODEL | WIFI |
             | -------- | ------- | ------- |
-            | **S905x**  | **HG680P** | **ON** (`-`) |
-            | **S905x**  | **B860H** | **NOT TEST**|
-            | **S905X4** | **ADVAN AT01** | **OFF** (`-`) |
-            | **S905X4** | **AKARI** | **OFF** (`-`) |
-            | **s905x2** | **HG680FJ** | **NOT TEST** (`-`) |
+            | **S905x**  | **HG680P**<br>**B860H** | **ON**<br>**NOT TEST** |
+            | **S905X4** | **ADVAN AT01**<br>**AJARI** | **OFF**<br>**OFF** |
+            | **S905x2** | **HG680FJ** | **NOT TEST** (`-`) |
 
           files: |
             /builder/output/*
