@@ -201,3 +201,9 @@ jobs:
             - The kernel nama: ${{ inputs.kernel_sign }}
             - This is a `${{ inputs.kernel_mu }}` kernel, which can be used in Armbian and OpenWrt.
             - 这是`稳定版`内核，可以在 Armbian 和 OpenWrt 里使用。
+            ## Supported Devices
+            | Amlogic | MODEL | WIFI |
+            | -------- | ------- | ------- |
+            | **S905x**  | **HG680P**<br>**B860H** | **ON**<br>**NOT TEST** |
+            | **S905X4** | **ADVAN AT01**<br>**AKARI** | **OFF**<br>**OFF** |
+            | **S905x2** | **HG680FJ** | **NOT TEST** (`-`) |
