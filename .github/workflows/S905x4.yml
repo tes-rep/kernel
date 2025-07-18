@@ -183,7 +183,7 @@ jobs:
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_config: ${{ inputs.kernel_config }}
           compress_format: ${{ inputs.compress_format }}
-          silent_log: true
+          silent_log: false
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
