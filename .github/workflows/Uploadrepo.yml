@@ -193,7 +193,7 @@ jobs:
             | Amlogic | MODEL | WIFI |
             | -------- | ------- | ------- |
             | **S905x**  | **HG680P**<br>**B860H** | **ON**<br>**NOT TEST** |
-            | **S905X4** | **ADVAN AT01**<br>**AJARI** | **OFF**<br>**OFF** |
+            | **S905X4** | **ADVAN AT01**<br>**AKARI** | **OFF**<br>**OFF** |
             | **S905x2** | **HG680FJ** | **NOT TEST** (`-`) |
 
       - name: Upload Kernel to Release (repo lain)
@@ -204,7 +204,7 @@ jobs:
         with:
           tag_name: kernel_${{ inputs.kernel_mu }}
           repository: ${{ inputs.compress_format }}  # GANTI dengan repo tujuan kamu
-          name: Kernel Release ${{ inputs.kernel_mu }}
+          name: Kernel_${{ inputs.kernel_mu }}
           body: |
             ### Kernel Build Information
             - Version: `${{ inputs.kernel_version }}`
@@ -215,7 +215,7 @@ jobs:
             | Amlogic | MODEL | WIFI |
             | -------- | ------- | ------- |
             | **S905x**  | **HG680P**<br>**B860H** | **ON**<br>**NOT TEST** |
-            | **S905X4** | **ADVAN AT01**<br>**AJARI** | **OFF**<br>**OFF** |
+            | **S905X4** | **ADVAN AT01**<br>**AKARI** | **OFF**<br>**OFF** |
             | **S905x2** | **HG680FJ** | **NOT TEST** (`-`) |
 
           files: |
