@@ -105,6 +105,7 @@ on:
           - beta    
           - dtb
           - wifi_on
+          - performa
 
 env:
   TZ: Asia/Jakarta
