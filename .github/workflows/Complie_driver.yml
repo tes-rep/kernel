@@ -1,0 +1,59 @@
+name: Build and Release Kernel Driver
+
+on:
+  workflow_dispatch:
+    inputs:
+      driver_repo:
+        description: "URL repo driver (contoh: https://github.com/your/driver)"
+        required: true
+        type: string
+      driver_dir:
+        description: "Nama folder driver (otomatis di-clone ke sini)"
+        required: true
+        default: "driver-src"
+      module_name:
+        description: "Nama file .ko yang akan dihasilkan (tanpa .ko)"
+        required: true
+        default: "8189es"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Compile and Release
+    steps:
+
+    - name: Checkout this repo
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential bc kmod
+
+    - name: Clone Driver Repo
+      run: |
+        git clone --depth=1 ${{ github.event.inputs.driver_repo }} ${{ github.event.inputs.driver_dir }}
+
+    - name: Simulate kernel headers (mock for build)
+      run: |
+        mkdir -p kernel-headers
+        touch kernel-headers/Makefile
+        echo "obj-m += ${{ github.event.inputs.module_name }}.o" > ${{ github.event.inputs.driver_dir }}/Makefile
+        echo "all:" >> ${{ github.event.inputs.driver_dir }}/Makefile
+        echo -e "\t\$(MAKE) -C ../kernel-headers M=\$(PWD) modules" >> ${{ github.event.inputs.driver_dir }}/Makefile
+
+    - name: Compile driver
+      working-directory: ${{ github.event.inputs.driver_dir }}
+      run: make
+
+    - name: Rename .ko output
+      run: |
+        mkdir output
+        find ${{ github.event.inputs.driver_dir }} -name '*.ko' -exec cp {} output/${{ github.event.inputs.module_name }}.ko \;
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: output/${{ github.event.inputs.module_name }}.ko
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
