@@ -1,57 +1,76 @@
-name: Build and Release Kernel Driver
+name: Build Kernel Driver Out-of-Tree
 
 on:
   workflow_dispatch:
     inputs:
+      kernel_url:
+        description: "URL untuk mengunduh source kernel"
+        required: true
+        type: string
       driver_repo:
         description: "URL repo driver (contoh: https://github.com/your/driver)"
         required: true
         type: string
+      module_name:
+        description: "Nama file .ko yang dihasilkan (tanpa .ko)"
+        required: true
+        default: "8189fs"
       driver_dir:
-        description: "Nama folder driver (otomatis di-clone ke sini)"
+        description: "Nama folder untuk menyimpan source driver (default: driver-src)"
         required: true
         default: "driver-src"
-      module_name:
-        description: "Nama file .ko yang akan dihasilkan (tanpa .ko)"
-        required: true
-        default: "8189es"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Compile and Release
+    name: Compile and Release Driver
+
     steps:
+    # 1. Checkout source repository (jika ada)
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-    - name: Checkout this repo
-      uses: actions/checkout@v4
-
+    # 2. Install dependencies
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y build-essential bc kmod
+        sudo apt install -y build-essential bc kmod libelf-dev libssl-dev libncurses-dev curl wget
 
+    # 3. Download kernel source
+    - name: Download Kernel Source from URL
+      run: |
+        curl -L -o kernel-source.tar.gz ${{ github.event.inputs.kernel_url }}
+        tar -xzvf kernel-source.tar.gz
+        cd kernel-source
+        make defconfig
+
+    # 4. Prepare for out-of-tree module build
+    - name: Prepare kernel source
+      run: |
+        cd kernel-source
+        make modules_prepare
+
+    # 5. Clone Driver Repo
     - name: Clone Driver Repo
       run: |
         git clone --depth=1 ${{ github.event.inputs.driver_repo }} ${{ github.event.inputs.driver_dir }}
 
-    - name: Simulate kernel headers (mock for build)
+    # 6. Compile driver
+    - name: Compile the driver
       run: |
-        mkdir -p kernel-headers
-        touch kernel-headers/Makefile
-        echo "obj-m += ${{ github.event.inputs.module_name }}.o" > ${{ github.event.inputs.driver_dir }}/Makefile
-        echo "all:" >> ${{ github.event.inputs.driver_dir }}/Makefile
-        echo -e "\t\$(MAKE) -C ../kernel-headers M=\$(PWD) modules" >> ${{ github.event.inputs.driver_dir }}/Makefile
+        cd ${{ github.event.inputs.driver_dir }}
+        make ARCH=arm64 \
+          CROSS_COMPILE=aarch64-none-linux-gnu- \
+          KSRC=$(pwd)/../kernel-source
 
-    - name: Compile driver
-      working-directory: ${{ github.event.inputs.driver_dir }}
-      run: make
-
+    # 7. Rename output .ko file
     - name: Rename .ko output
       run: |
         mkdir output
         find ${{ github.event.inputs.driver_dir }} -name '*.ko' -exec cp {} output/${{ github.event.inputs.module_name }}.ko \;
 
-    - name: Upload to Release
+    # 8. Upload to GitHub Release
+    - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         files: output/${{ github.event.inputs.module_name }}.ko
