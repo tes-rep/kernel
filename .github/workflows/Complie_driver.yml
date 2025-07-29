@@ -67,10 +67,12 @@ jobs:
         make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
         make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
 
-    - name: Build Kernel Driver
+    - name: Build Driver
       run: |
-        cd driver
-        make
+       cd driver
+       make
+       ls -lh *.ko  # Cek apakah file .ko berhasil dibuat
+
 
     - name: Archive Output
       run: |
