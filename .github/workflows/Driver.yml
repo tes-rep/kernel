@@ -28,12 +28,15 @@ jobs:
     - name: Install ARM64 Toolchain
       run: |
         sudo apt update
-        sudo apt install -y gcc-aarch64-linux-gnu make bc
+        sudo apt install -y gcc-aarch64-linux-gnu make bc unzip curl
 
     - name: Clone Kernel Source
       run: |
         git clone --depth 1 --branch "${{ inputs.kernel_branch }}" "${{ inputs.repo_url }}" kernel
-        ls kernel
+
+    - name: Clone Kernel Config
+      run: |
+        git clone https://github.com/tes-rep/kernel kernel-config
 
     - name: Download Driver (Opsional)
       if: ${{ inputs.driver_url != '' }}
@@ -41,40 +44,32 @@ jobs:
         mkdir -p driver
         curl -L "${{ inputs.driver_url }}" -o driver.zip
         unzip driver.zip -d driver
+
     - name: Setup Kernel Config
       run: |
-       cp kernel-config/release/s905x4/config-6.12 kernel/.config
-       cd kernel
-       make ARCH=arm64 olddefconfig
-       make ARCH=arm64 modules_prepare
-
+        cp kernel-config/kernel-config/release/s905x4/config-6.12 kernel/.config
+        cd kernel
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
 
     - name: Build Kernel Module
       run: |
-        cd kernel
-
-        # Contoh buat out-of-tree driver
         export ARCH=arm64
         export CROSS_COMPILE=aarch64-linux-gnu-
-
-        # Sesuaikan: Tambahkan path ke driver yang ingin dikompilasi
-        make modules_prepare
+        cd kernel
         make M=../driver modules
-
-        # Salin hasil
-        mkdir -p ../output
-        find ../driver -name '*.ko' -exec cp {} ../output/ \;
 
     - name: Archive Output
       run: |
+        mkdir -p output
+        find driver -name '*.ko' -exec cp {} output/ \;
         cd output
-        tar -czf driver-output.tar.gz *.ko
-        echo "RELEASE_FILE=output/driver-output.tar.gz" >> $GITHUB_ENV
+        tar -czf driver-output.tar.gz *.ko || echo "Build failed or no .ko found"
 
     - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ inputs.release_tag }}
-        files: ${{ env.RELEASE_FILE }}
+        files: output/driver-output.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
