@@ -1,26 +1,21 @@
-name: Build ARM64 Driver and Release
+name: Build Kernel Driver and Release
 
 on:
   workflow_dispatch:
     inputs:
       repo_url:
-        description: 'Repo Git source kernel (ARM64)'
+        description: 'Repo Git source kernel'
+        required: true
+      driver_url:
+        description: 'Driver ZIP/Git archive (opsional)'
         required: true
       kernel_branch:
         description: 'Branch Kernel (default=main)'
         default: 'main'
         required: false
-      config_path:
-        description: 'Path ke file .config (misal: config-6.12)'
-        required: true
-      driver_url:
-        description: 'URL ZIP/Git driver source'
-        required: true
-      driver_folder:
-        description: 'Nama folder setelah unzip/clone (misal: rtl8189fs)'
-        required: true
       release_tag:
         description: 'Tag Release (misal: v1.0)'
+        default: 'v1.0'
         required: true
 
 jobs:
@@ -31,35 +26,65 @@ jobs:
     - name: Checkout Workspace
       uses: actions/checkout@v4
 
-    - name: Install ARM64 Toolchain & Utils
+    - name: Install Dependencies
       run: |
         sudo apt update
-        sudo apt install -y gcc-aarch64-linux-gnu make bc unzip curl tar
+        sudo apt install -y bc make unzip curl gcc make git
 
     - name: Clone Kernel Source
       run: |
         git clone --depth 1 --branch "${{ inputs.kernel_branch }}" "${{ inputs.repo_url }}" kernel
 
-    - name: Apply Kernel Config
+    - name: Download & Setup ARM64 Toolchain (Dynamic)
       run: |
-        cp "${{ inputs.config_path }}" kernel/.config
-        cd kernel
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
+        set -e
 
-    - name: Download and Extract Driver
+        TOOLCHAIN_DIR="/opt/toolchain"
+        mkdir -p "$TOOLCHAIN_DIR"
+
+        # Detect host arch
+        ARCH=$(uname -m)
+        echo "Detected architecture: $ARCH"
+
+        if [[ "$ARCH" == "x86_64" ]]; then
+          TOOLCHAIN_FILE="arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+        elif [[ "$ARCH" == "aarch64" ]]; then
+          TOOLCHAIN_FILE="arm-gnu-toolchain-14.2.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
+        else
+          echo "Unsupported architecture: $ARCH"
+          exit 1
+        fi
+
+        TOOLCHAIN_URL="https://github.com/ophub/kernel/releases/download/dev/$TOOLCHAIN_FILE"
+        curl -L "$TOOLCHAIN_URL" | sudo tar -xJ -C "$TOOLCHAIN_DIR"
+
+        TOOLCHAIN_BIN="$(find $TOOLCHAIN_DIR -type d -name 'bin' | head -n1)"
+        echo "TOOLCHAIN_PATH=$TOOLCHAIN_BIN" >> $GITHUB_ENV
+        echo "CROSS_COMPILE=aarch64-none-linux-gnu-" >> $GITHUB_ENV
+
+    - name: Setup Kernel Config
+      run: |
+        cp kernel/config-* kernel/.config || true
+        cd kernel
+        export PATH=${{ env.TOOLCHAIN_PATH }}:$PATH
+        export ARCH=arm64
+        export CROSS_COMPILE=${{ env.CROSS_COMPILE }}
+        make olddefconfig
+        make modules_prepare
+
+    - name: Download & Extract Driver
       run: |
         mkdir -p driver
         curl -L "${{ inputs.driver_url }}" -o driver.zip
-        unzip driver.zip -d driver/
-        mv driver/rtl8189ES_linux-rtl8189fs "driver/${{ inputs.driver_folder }}"
+        unzip driver.zip -d driver
+        mv driver/* driver/rtl8189fs
 
-    - name: Create Minimal Makefile
+    - name: Inject Minimal Makefile
       run: |
-        cat <<EOF > driver/Makefile
-        obj-m += ${{ inputs.driver_folder }}/
-        KDIR := \$(PWD)/kernel
-        PWD := \$(PWD)
+        cat <<'EOF' > driver/Makefile
+        obj-m += rtl8189fs/
+        KDIR ?= ../kernel
+        PWD := \$(shell pwd)
         all:
         	\$(MAKE) -C \$(KDIR) M=\$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
         clean:
@@ -68,20 +93,24 @@ jobs:
 
     - name: Build Driver
       run: |
+        export PATH=${{ env.TOOLCHAIN_PATH }}:$PATH
+        export ARCH=arm64
+        export CROSS_COMPILE=${{ env.CROSS_COMPILE }}
         cd driver
         make
 
-    - name: Archive .ko Output
+    - name: Archive Output
       run: |
         mkdir -p output
         find driver -name '*.ko' -exec cp {} output/ \;
         cd output
         tar -czf driver-output.tar.gz *.ko
+        echo "RELEASE_FILE=output/driver-output.tar.gz" >> $GITHUB_ENV
 
     - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ inputs.release_tag }}
-        files: output/driver-output.tar.gz
+        files: ${{ env.RELEASE_FILE }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
