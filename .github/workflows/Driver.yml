@@ -1,21 +1,26 @@
-name: Build Kernel Driver and Release6
+name: Build ARM64 Driver and Release
 
 on:
   workflow_dispatch:
     inputs:
       repo_url:
-        description: 'Repo Git source kernel'
+        description: 'Repo Git source kernel (ARM64)'
         required: true
-      driver_url:
-        description: 'Driver ZIP/Git archive (opsional)'
-        required: false
       kernel_branch:
-        description: 'Branch Kernel (default=master)'
+        description: 'Branch Kernel (default=main)'
         default: 'main'
         required: false
+      config_path:
+        description: 'Path ke file .config (misal: config-6.12)'
+        required: true
+      driver_url:
+        description: 'URL ZIP/Git driver source'
+        required: true
+      driver_folder:
+        description: 'Nama folder setelah unzip/clone (misal: rtl8189fs)'
+        required: true
       release_tag:
         description: 'Tag Release (misal: v1.0)'
-        default: 'v1.0'
         required: true
 
 jobs:
@@ -26,60 +31,52 @@ jobs:
     - name: Checkout Workspace
       uses: actions/checkout@v4
 
-    - name: Install ARM64 Toolchain
+    - name: Install ARM64 Toolchain & Utils
       run: |
         sudo apt update
-        sudo apt install -y gcc-aarch64-linux-gnu make bc unzip curl
+        sudo apt install -y gcc-aarch64-linux-gnu make bc unzip curl tar
 
     - name: Clone Kernel Source
       run: |
         git clone --depth 1 --branch "${{ inputs.kernel_branch }}" "${{ inputs.repo_url }}" kernel
 
-    - name: Clone Kernel Config
+    - name: Apply Kernel Config
       run: |
-        rm -rf kernel-config
-        git clone https://github.com/tes-rep/kernel kernel-config
+        cp "${{ inputs.config_path }}" kernel/.config
+        cd kernel
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
 
-    - name: Download Driver (Opsional)
-      if: ${{ inputs.driver_url != '' }}
+    - name: Download and Extract Driver
       run: |
         mkdir -p driver
         curl -L "${{ inputs.driver_url }}" -o driver.zip
         unzip driver.zip -d driver/
-        mv driver/rtl8189ES_linux-rtl8189fs driver/rtl8189fs
-    - name: Inject Minimal Makefile
-      run: |
-       cat <<'EOF' > driver/Makefile
-       obj-m += rtl8189fs/
-       KDIR ?= /lib/modules/$(shell uname -r)/build
-       PWD := \$(shell pwd)
-       all:
-       	\$(MAKE) -C \$(KDIR) M=\$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
-       clean:
-       	\$(MAKE) -C \$(KDIR) M=\$(PWD) clean
-       EOF
+        mv driver/* "${{ inputs.driver_folder }}"
 
-    - name: Setup Kernel Config
+    - name: Create Minimal Makefile
       run: |
-        cp kernel-config/kernel-config/release/s905x4/config-6.12 kernel/.config
-        cd kernel
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
-        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
-        make ARCH=arm64 modules -j2
+        cat <<EOF > driver/Makefile
+        obj-m += ${{ inputs.driver_folder }}/
+        KDIR := \$(PWD)/kernel
+        PWD := \$(PWD)
+        all:
+        	\$(MAKE) -C \$(KDIR) M=\$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+        clean:
+        	\$(MAKE) -C \$(KDIR) M=\$(PWD) clean
+        EOF
 
-    - name: Build Kernel Module
+    - name: Build Driver
       run: |
-        export ARCH=arm64
-        export CROSS_COMPILE=aarch64-linux-gnu-
-        cd kernel
-        make M=../driver modules
+        cd driver
+        make
 
-    - name: Archive Output
+    - name: Archive .ko Output
       run: |
         mkdir -p output
         find driver -name '*.ko' -exec cp {} output/ \;
         cd output
-        tar -czf driver-output.tar.gz *.ko || echo "Build failed or no .ko found"
+        tar -czf driver-output.tar.gz *.ko
 
     - name: Upload to GitHub Release
       uses: softprops/action-gh-release@v2
