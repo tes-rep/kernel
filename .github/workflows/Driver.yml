@@ -51,12 +51,11 @@ jobs:
        obj-m += 8189es.o
        KDIR ?= /lib/modules/$(shell uname -r)/build
        PWD := \$(shell pwd)
-    all:
-     	\$(MAKE) -C \$(KDIR) M=\$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
-    clean:
-     	\$(MAKE) -C \$(KDIR) M=\$(PWD) clean
-     EOF
-    
+       all:
+       	\$(MAKE) -C \$(KDIR) M=\$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+       clean:
+       	\$(MAKE) -C \$(KDIR) M=\$(PWD) clean
+       EOF
 
     - name: Setup Kernel Config
       run: |
