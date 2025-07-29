@@ -64,7 +64,7 @@ jobs:
 
     - name: Setup Kernel Config
       run: |
-        cp kernel/config-* kernel/.config || true
+        cp kernel-config/release/s905x4/config-6.12 kernel/.config || true
         cd kernel
         export PATH=${{ env.TOOLCHAIN_PATH }}:$PATH
         export ARCH=arm64
