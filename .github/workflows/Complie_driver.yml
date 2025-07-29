@@ -1,54 +1,89 @@
-name: Build RTL8189FS Driver
+name: Build Kernel Driver and Releasefs
 
 on:
   workflow_dispatch:
     inputs:
-      kernel_repo:
-        description: "Repo source kernel (contoh: https://github.com/user/linux)"
+      repo_url:
+        description: 'Repo Git source kernel'
         required: true
+      driver_url:
+        description: 'Driver ZIP/Git archive (opsional)'
+        required: false
       kernel_branch:
-        description: "Branch kernel (contoh: main, v6.12, dsb)"
+        description: 'Branch Kernel (default=main)'
+        default: 'main'
+        required: false
+      release_tag:
+        description: 'Tag Release (misal: v1.0)'
+        default: 'v1.0'
         required: true
-      driver_repo:
-        description: "Repo driver RTL8189FS"
-        required: true
-      driver_branch:
-        description: "Branch driver (default: master)"
-        required: true
-        default: "master"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Build rtl8189fs module
 
     steps:
-    - name: Install dependencies
+    - name: Checkout Workspace
+      uses: actions/checkout@v4
+
+    - name: Install Dependencies
       run: |
         sudo apt update
-        sudo apt install -y git build-essential bc kmod libelf-dev \
-             libssl-dev libncurses-dev flex bison dwarves
+        sudo apt install -y gcc-aarch64-linux-gnu make bc unzip curl
 
-    - name: Clone kernel source
+    - name: Clone Kernel Source
       run: |
-        git clone --depth=1 --branch "${{ github.event.inputs.kernel_branch }}" \
-          "${{ github.event.inputs.kernel_repo }}" kernel-source
-        cd kernel-source
-        make defconfig
-        make modules_prepare
+        git clone --depth 1 --branch "${{ inputs.kernel_branch }}" "${{ inputs.repo_url }}" kernel
 
-    - name: Clone rtl8189fs driver
+    - name: Clone Kernel Config
       run: |
-        git clone --depth=1 --branch "${{ github.event.inputs.driver_branch }}" \
-          "${{ github.event.inputs.driver_repo }}" driver-src
+        rm -rf kernel-config
+        git clone https://github.com/tes-rep/kernel kernel-config
 
-    - name: Build module
+    - name: Download and Rename Driver
+      if: ${{ inputs.driver_url != '' }}
       run: |
-        cd driver-src
-        make ARCH=arm64 KSRC=$(pwd)/../kernel-source
+        mkdir -p driver
+        curl -L "${{ inputs.driver_url }}" -o driver.zip
+        unzip driver.zip -d driver/
+        mv driver/rtl8189ES_linux-rtl8189fs driver/rtl8189fs
 
-    - name: Upload .ko file
-      uses: actions/upload-artifact@v4
+    - name: Inject Minimal Makefile
+      run: |
+        cat <<'EOF' > driver/Makefile
+        obj-m += rtl8189fs/
+        KDIR ?= /lib/modules/$(shell uname -r)/build
+        PWD := $(shell pwd)
+        all:
+        	$(MAKE) -C $(KDIR) M=$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+        clean:
+        	$(MAKE) -C $(KDIR) M=$(PWD) clean
+        EOF
+
+    - name: Setup Kernel Config & Generate Module.symvers
+      run: |
+        cp kernel-config/kernel-config/release/s905x4/config-6.12 kernel/.config
+        cd kernel
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
+        make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules -j2
+
+    - name: Build Kernel Driver
+      run: |
+        cd driver
+        make
+
+    - name: Archive Output
+      run: |
+        mkdir -p output
+        find driver -name '*.ko' -exec cp {} output/ \;
+        cd output
+        tar -czf driver-output.tar.gz *.ko
+
+    - name: Upload to GitHub Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: rtl8189fs-ko
-        path: driver-src/*.ko
+        tag_name: ${{ inputs.release_tag }}
+        files: output/driver-output.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
