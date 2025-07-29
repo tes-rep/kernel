@@ -44,7 +44,7 @@ jobs:
     - name: Setup kernel config
       run: |
        cd kernel
-       cp kernel-config/release/s905x4/config-6.12 # atau make defconfig
+       cp kernel-config/release/s905x4/config-6.12 ./.config # atau make defconfig
        make olddefconfig
        make modules_prepare
 
