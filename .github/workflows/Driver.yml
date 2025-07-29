@@ -36,6 +36,7 @@ jobs:
 
     - name: Clone Kernel Config
       run: |
+        rm -rf kernel-config
         git clone https://github.com/tes-rep/kernel kernel-config
 
     - name: Download Driver (Opsional)
