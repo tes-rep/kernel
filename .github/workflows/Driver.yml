@@ -11,10 +11,11 @@ on:
         required: false
       kernel_branch:
         description: 'Branch Kernel (default=master)'
-        default: 'master'
+        default: 'main'
         required: false
       release_tag:
         description: 'Tag Release (misal: v1.0)'
+        default: 'v1.0'
         required: true
 
 jobs:
