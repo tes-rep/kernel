@@ -41,6 +41,12 @@ jobs:
         mkdir -p driver
         curl -L "${{ inputs.driver_url }}" -o driver.zip
         unzip driver.zip -d driver
+    - name: Setup kernel config
+      run: |
+       cd kernel
+       cp kernel-config/release/s905x4/config-6.12 # atau make defconfig
+       make olddefconfig
+       make modules_prepare
 
     - name: Build Kernel Module
       run: |
