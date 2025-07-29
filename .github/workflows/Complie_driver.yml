@@ -45,7 +45,7 @@ jobs:
         mkdir -p driver
         curl -L "${{ inputs.driver_url }}" -o driver.zip
         unzip driver.zip -d driver/
-        mv driver/rtl8189ES_linux* driver/rtl8189fs
+        mv driver/rtl8189ES_linux-rtl8189fs driver/rtl8189fs
 
     - name: Inject Makefile (if not exist)
       run: |
