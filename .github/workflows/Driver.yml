@@ -1,0 +1,73 @@
+name: Build Kernel Driver and Release6
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'Repo Git source kernel'
+        required: true
+      driver_url:
+        description: 'Driver ZIP/Git archive (opsional)'
+        required: false
+      kernel_branch:
+        description: 'Branch Kernel (default=master)'
+        default: 'master'
+        required: false
+      release_tag:
+        description: 'Tag Release (misal: v1.0)'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Workspace
+      uses: actions/checkout@v4
+
+    - name: Install ARM64 Toolchain
+      run: |
+        sudo apt update
+        sudo apt install -y gcc-aarch64-linux-gnu make bc
+
+    - name: Clone Kernel Source
+      run: |
+        git clone --depth 1 --branch "${{ inputs.kernel_branch }}" "${{ inputs.repo_url }}" kernel
+        ls kernel
+
+    - name: Download Driver (Opsional)
+      if: ${{ inputs.driver_url != '' }}
+      run: |
+        mkdir -p driver
+        curl -L "${{ inputs.driver_url }}" -o driver.zip
+        unzip driver.zip -d driver
+
+    - name: Build Kernel Module
+      run: |
+        cd kernel
+
+        # Contoh buat out-of-tree driver
+        export ARCH=arm64
+        export CROSS_COMPILE=aarch64-linux-gnu-
+
+        # Sesuaikan: Tambahkan path ke driver yang ingin dikompilasi
+        make modules_prepare
+        make M=../driver modules
+
+        # Salin hasil
+        mkdir -p ../output
+        find ../driver -name '*.ko' -exec cp {} ../output/ \;
+
+    - name: Archive Output
+      run: |
+        cd output
+        tar -czf driver-output.tar.gz *.ko
+        echo "RELEASE_FILE=output/driver-output.tar.gz" >> $GITHUB_ENV
+
+    - name: Upload to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ inputs.release_tag }}
+        files: ${{ env.RELEASE_FILE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
