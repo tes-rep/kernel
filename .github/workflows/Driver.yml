@@ -43,7 +43,7 @@ jobs:
         unzip driver.zip -d driver
     - name: Setup Kernel Config
       run: |
-       cp kernel/kernel-config/release/s905x4/config-6.12 kernel/.config
+       cp kernel-config/release/s905x4/config-6.12 kernel/.config
        cd kernel
        make ARCH=arm64 olddefconfig
        make ARCH=arm64 modules_prepare
