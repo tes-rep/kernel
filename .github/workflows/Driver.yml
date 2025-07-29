@@ -59,7 +59,7 @@ jobs:
       run: |
         cat <<EOF > driver/Makefile
         obj-m += rtl8189fs/
-        KDIR ?= ../kernel
+        KDIR ?= /lib/modules/\$(shell uname -r)/build
         PWD := \$(PWD)
         all:
         	\$(MAKE) -C \$(KDIR) ARCH=\$(ARCH) CROSS_COMPILE=\$(CROSS_COMPILE) M=\$(PWD) modules
