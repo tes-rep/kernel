@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       repo_url:
-        description: 'Repo Git source kernel'
+        description: 'Repo Git kernel source'
         required: true
       driver_url:
-        description: 'Driver ZIP/Git archive (opsional)'
+        description: 'Driver ZIP/Git archive'
         required: true
       kernel_branch:
-        description: 'Branch Kernel (default=main)'
+        description: 'Branch Kernel (default: main)'
         default: 'main'
         required: false
       release_tag:
@@ -22,6 +22,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ARCH: arm64
+      CROSS_COMPILE: aarch64-none-linux-gnu-
+      TOOLCHAIN_PATH: /opt/toolchain/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu/bin
+
     steps:
     - name: Checkout Workspace
       uses: actions/checkout@v4
@@ -29,73 +34,50 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt update
-        sudo apt install -y bc make unzip curl gcc make git
+        sudo apt install -y make bc curl unzip xz-utils git build-essential
+
+    - name: Download & Extract ARM64 Toolchain (gcc 14.2)
+      run: |
+        mkdir -p /opt/toolchain
+        cd /opt/toolchain
+        curl -L https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz -o toolchain.tar.xz
+        tar -xf toolchain.tar.xz
+        echo "Toolchain extracted"
 
     - name: Clone Kernel Source
       run: |
         git clone --depth 1 --branch "${{ inputs.kernel_branch }}" "${{ inputs.repo_url }}" kernel
 
-    - name: Download & Setup ARM64 Toolchain (Dynamic)
+    - name: Download Driver
       run: |
-        set -e
+        mkdir -p driver
+        curl -L "${{ inputs.driver_url }}" -o driver.zip
+        unzip driver.zip -d driver/
+        mv driver/* driver/rtl8189fs || true
 
-        TOOLCHAIN_DIR="/opt/toolchain"
-        mkdir -p "$TOOLCHAIN_DIR"
-
-        # Detect host arch
-        ARCH=$(uname -m)
-        echo "Detected architecture: $ARCH"
-
-        if [[ "$ARCH" == "x86_64" ]]; then
-          TOOLCHAIN_FILE="arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
-        elif [[ "$ARCH" == "aarch64" ]]; then
-          TOOLCHAIN_FILE="arm-gnu-toolchain-14.2.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
-        else
-          echo "Unsupported architecture: $ARCH"
-          exit 1
-        fi
-
-        TOOLCHAIN_URL="https://github.com/ophub/kernel/releases/download/dev/$TOOLCHAIN_FILE"
-        curl -L "$TOOLCHAIN_URL" | sudo tar -xJ -C "$TOOLCHAIN_DIR"
-
-        TOOLCHAIN_BIN="$(find $TOOLCHAIN_DIR -type d -name 'bin' | head -n1)"
-        echo "TOOLCHAIN_PATH=$TOOLCHAIN_BIN" >> $GITHUB_ENV
-        echo "CROSS_COMPILE=aarch64-none-linux-gnu-" >> $GITHUB_ENV
+    - name: Inject Minimal Makefile
+      run: |
+        cat <<EOF > driver/Makefile
+        obj-m += rtl8189fs/
+        KDIR := \$(PWD)/kernel
+        PWD := \$(PWD)
+        all:
+        	\$(MAKE) -C \$(KDIR) ARCH=\$(ARCH) CROSS_COMPILE=\$(CROSS_COMPILE) M=\$(PWD) modules
+        clean:
+        	\$(MAKE) -C \$(KDIR) ARCH=\$(ARCH) CROSS_COMPILE=\$(CROSS_COMPILE) M=\$(PWD) clean
+        EOF
 
     - name: Setup Kernel Config
       run: |
         cp kernel-config/release/s905x4/config-6.12 kernel/.config || true
         cd kernel
-        export PATH=${{ env.TOOLCHAIN_PATH }}:$PATH
-        export ARCH=arm64
-        export CROSS_COMPILE=${{ env.CROSS_COMPILE }}
+        export PATH=$TOOLCHAIN_PATH:$PATH
         make olddefconfig
         make modules_prepare
 
-    - name: Download & Extract Driver
-      run: |
-        mkdir -p driver
-        curl -L "${{ inputs.driver_url }}" -o driver.zip
-        unzip driver.zip -d driver
-        mv driver/* driver/rtl8189fs
-
-    - name: Inject Minimal Makefile
-      run: |
-        cat <<'EOF' > driver/Makefile
-        obj-m += rtl8189fs/
-        KDIR ?= ../kernel
-        PWD := \$(shell pwd)
-        all:
-        	\$(MAKE) -C \$(KDIR) M=\$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
-        clean:
-        	\$(MAKE) -C \$(KDIR) M=\$(PWD) clean
-        EOF
-
     - name: Build Driver
       run: |
-        export PATH=${{ env.TOOLCHAIN_PATH }}:$PATH
-        export ARCH=arm64
-        export CROSS_COMPILE=${{ env.CROSS_COMPILE }}
+        export PATH=$TOOLCHAIN_PATH:$PATH
         cd driver
         make
 
