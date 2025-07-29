@@ -44,11 +44,11 @@ jobs:
       run: |
         mkdir -p driver
         curl -L "${{ inputs.driver_url }}" -o driver.zip
-        unzip driver.zip -d driver
+        unzip driver.zip -d driver/rtl8189fs
     - name: Inject Minimal Makefile
       run: |
        cat <<'EOF' > driver/Makefile
-       obj-m += 8189fs.o
+       obj-m += rtl8189fs/
        KDIR ?= /lib/modules/$(shell uname -r)/build
        PWD := \$(shell pwd)
        all:
