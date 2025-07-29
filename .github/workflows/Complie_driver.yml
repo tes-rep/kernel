@@ -1,74 +1,54 @@
-name: Build Kernel Driver Out-of-Tree from GitHub Repo
+name: Build RTL8189FS Driver
 
 on:
   workflow_dispatch:
     inputs:
-      driver_repo:
-        description: "URL repo driver (contoh: https://github.com/your/driver)"
-        required: true
-        type: string
-      module_name:
-        description: "Nama file .ko yang akan dihasilkan (tanpa .ko)"
-        required: true
-        default: "8189fs"
-      driver_dir:
-        description: "Nama folder untuk menyimpan source driver"
-        required: true
-        default: "driver-src"
       kernel_repo:
-        description: "URL repo source kernel (contoh: https://github.com/torvalds/linux)"
+        description: "Repo source kernel (contoh: https://github.com/user/linux)"
         required: true
-        type: string
       kernel_branch:
-        description: "Branch kernel yang akan digunakan"
+        description: "Branch kernel (contoh: main, v6.12, dsb)"
+        required: true
+      driver_repo:
+        description: "Repo driver RTL8189FS"
+        required: true
+      driver_branch:
+        description: "Branch driver (default: master)"
         required: true
         default: "master"
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Compile Driver with Kernel Source
+    name: Build rtl8189fs module
 
     steps:
-    # 1. Checkout repository driver
-    - name: Checkout Driver Repository
-      uses: actions/checkout@v2
-      with:
-        repository: ${{ github.event.inputs.driver_repo }}
-        path: ${{ github.event.inputs.driver_dir }}
-
-    # 2. Install dependencies
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y build-essential bc kmod libelf-dev libssl-dev libncurses-dev curl git
+        sudo apt install -y git build-essential bc kmod libelf-dev \
+             libssl-dev libncurses-dev flex bison dwarves
 
-    # 3. Clone kernel source repository
-    - name: Clone Kernel Source from GitHub
+    - name: Clone kernel source
       run: |
-        git clone --depth 1 --branch ${{ github.event.inputs.kernel_branch }} ${{ github.event.inputs.kernel_repo }} kernel-source
+        git clone --depth=1 --branch "${{ github.event.inputs.kernel_branch }}" \
+          "${{ github.event.inputs.kernel_repo }}" kernel-source
         cd kernel-source
         make defconfig
         make modules_prepare
 
-    # 4. Prepare driver and build
-    - name: Compile the driver
+    - name: Clone rtl8189fs driver
       run: |
-        cd ${{ github.event.inputs.driver_dir }}
-        make ARCH=arm64 \
-          CROSS_COMPILE=aarch64-none-linux-gnu- \
-          KSRC=$(pwd)/../kernel-source
+        git clone --depth=1 --branch "${{ github.event.inputs.driver_branch }}" \
+          "${{ github.event.inputs.driver_repo }}" driver-src
 
-    # 5. Rename .ko output
-    - name: Rename .ko output
+    - name: Build module
       run: |
-        mkdir output
-        find ${{ github.event.inputs.driver_dir }} -name '*.ko' -exec cp {} output/${{ github.event.inputs.module_name }}.ko \;
+        cd driver-src
+        make KSRC=$(pwd)/../kernel-source
 
-    # 6. Upload the compiled module to GitHub Release
-    - name: Upload to GitHub Release
-      uses: softprops/action-gh-release@v2
+    - name: Upload .ko file
+      uses: actions/upload-artifact@v4
       with:
-        files: output/${{ github.event.inputs.module_name }}.ko
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: rtl8189fs-ko
+        path: driver-src/*.ko
