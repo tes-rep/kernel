@@ -45,6 +45,18 @@ jobs:
         mkdir -p driver
         curl -L "${{ inputs.driver_url }}" -o driver.zip
         unzip driver.zip -d driver
+    - name: Inject Minimal Makefile
+      run: |
+       cat <<'EOF' > driver/Makefile
+       obj-m += 8189es.o
+       KDIR ?= /lib/modules/$(shell uname -r)/build
+       PWD := \$(shell pwd)
+    all:
+     	\$(MAKE) -C \$(KDIR) M=\$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules
+    clean:
+     	\$(MAKE) -C \$(KDIR) M=\$(PWD) clean
+     EOF
+    
 
     - name: Setup Kernel Config
       run: |
