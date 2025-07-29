@@ -65,6 +65,7 @@ jobs:
         cd kernel
         make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
         make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- modules_prepare
+        make ARCH=arm64 modules -j2
 
     - name: Build Kernel Module
       run: |
