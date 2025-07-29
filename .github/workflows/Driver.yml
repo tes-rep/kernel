@@ -48,7 +48,7 @@ jobs:
     - name: Inject Minimal Makefile
       run: |
        cat <<'EOF' > driver/Makefile
-       obj-m += 8189es.o
+       obj-m += 8189fs.o
        KDIR ?= /lib/modules/$(shell uname -r)/build
        PWD := \$(shell pwd)
        all:
