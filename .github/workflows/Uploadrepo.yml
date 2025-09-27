@@ -81,6 +81,7 @@ on:
           - kernel-config/release/s905x4
           - kernel-config/release/general
           - kernel-config/release/DBAI
+          - kernel-config/release/Tes
           - false
       kernel_mu:
         description: "Select the kernel source"
